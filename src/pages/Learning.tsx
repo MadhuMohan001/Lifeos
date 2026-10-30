@@ -1,0 +1,21 @@
+import { useState } from 'react'
+import Crud from '../Crud'
+const R = (g: string, names: string[]) => names.map(name => ({ roadmap: 'Java Backend', group: g, name, status: 'Not Started' }))
+const SEED = [...R('Core Java', ['OOP', 'Collections Framework', 'Exception Handling', 'Multithreading', 'Java 8+', 'Streams and Lambda Expressions']), ...R('Backend', ['JDBC', 'Maven', 'Spring Core', 'Dependency Injection', 'Spring Boot', 'REST APIs', 'JPA and Hibernate', 'Spring Security']), ...R('Other', ['SQL', 'PostgreSQL', 'Git and GitHub', 'DSA', 'Problem-solving'])]
+const ST = ['Not Started', 'In Progress', 'Completed'], D = (k: string, label: string) => ({ k, label, type: 'date' as const })
+const TABS: Record<string, JSX.Element> = {
+  Roadmap: <Crud store="topics" title="Roadmap topics" head={t => t.name} sub={t => `${t.roadmap} · ${t.group} · ${t.status} · ${t.hours}h${t.revise ? ' · revise ' + t.revise : ''}`} seed={{ label: 'Load Java Backend roadmap', items: SEED }}
+    fields={[{ k: 'roadmap', label: 'Roadmap (new name = new roadmap)', def: 'Java Backend' }, { k: 'group', label: 'Group' }, { k: 'name', label: 'Topic' }, { k: 'status', label: 'Status', type: 'select', opts: ST }, { k: 'hours', label: 'Study hours', type: 'number' }, D('revise', 'Next revision'), { k: 'notes', label: 'Notes', type: 'textarea' }, { k: 'outcome', label: 'Learning outcome', type: 'textarea' }]} />,
+  DSA: <Crud store="dsa" title="DSA problems" head={p => p.name} sub={p => `${p.date} · ${p.difficulty} · ${p.platform}`} fields={[{ k: 'name', label: 'Problem' }, { k: 'difficulty', label: 'Difficulty', type: 'select', opts: ['Easy', 'Medium', 'Hard'] }, { k: 'platform', label: 'Platform', def: 'LeetCode' }, D('date', 'Solved on'), { k: 'approach', label: 'Approach', type: 'textarea' }]} />,
+  Projects: <Crud store="projects" title="Project progress" head={p => p.name} sub={p => `${p.progress}% · ${p.status}`} fields={[{ k: 'name', label: 'Project' }, { k: 'status', label: 'Status', type: 'select', opts: ['Planning', 'Building', 'Done'] }, { k: 'progress', label: 'Progress %', type: 'number' }, { k: 'notes', label: 'Notes', type: 'textarea' }]} />,
+  Questions: <Crud store="questions" title="Interview questions" head={q => q.question} sub={q => `${q.topic} · ${q.confidence}`} fields={[{ k: 'question', label: 'Question', type: 'textarea' }, { k: 'topic', label: 'Topic' }, { k: 'confidence', label: 'Confidence', type: 'select', opts: ['Weak', 'OK', 'Strong'] }, { k: 'answer', label: 'My answer', type: 'textarea' }]} />,
+  Mocks: <Crud store="mocks" title="Mock interviews" head={m => `${m.date} · ${m.score}/10`} sub={m => m.type + ' — ' + m.feedback} fields={[D('date', 'Date'), { k: 'type', label: 'Type', type: 'select', opts: ['Java', 'DSA', 'HR', 'Mixed'] }, { k: 'score', label: 'Score (0-10)', type: 'number' }, { k: 'feedback', label: 'Feedback', type: 'textarea' }]} />,
+  Communication: <Crud store="comm" title="Communication practice" head={c => `${c.date} · ${c.activity}`} sub={c => `${c.minutes} min · ${c.notes}`} fields={[D('date', 'Date'), { k: 'activity', label: 'Activity', def: 'Self-introduction' }, { k: 'minutes', label: 'Minutes', type: 'number' }, { k: 'notes', label: 'Notes', type: 'textarea' }]} />,
+  Jobs: <Crud store="jobs" title="Job applications" head={j => `${j.company} — ${j.role}`} sub={j => `${j.date} · ${j.status}${j.rounds ? ' · ' + j.rounds : ''}`} fields={[{ k: 'company', label: 'Company' }, { k: 'role', label: 'Role' }, { k: 'link', label: 'Application link' }, D('date', 'Applied on'), { k: 'status', label: 'Status', type: 'select', opts: ['Applied', 'Assessment', 'Interview', 'Offer', 'Rejected'] }, { k: 'assessment', label: 'Online assessment details', type: 'textarea' }, { k: 'rounds', label: 'Interview rounds' }, { k: 'feedback', label: 'Feedback / remarks', type: 'textarea' }]} />,
+}
+export default function Learning() {
+  const [t, setT] = useState('Roadmap')
+  return (<div className="p-4"><h1 className="mb-2 text-xl font-bold">Learning & Career</h1>
+    <div className="mb-3 flex gap-2 overflow-x-auto">{Object.keys(TABS).map(k => <button key={k} onClick={() => setT(k)} className={`whitespace-nowrap rounded-full px-3 py-1 text-sm ${t === k ? 'bg-indigo-600 text-white' : 'bg-slate-200'}`}>{k}</button>)}</div>
+    <div key={t}>{TABS[t]}</div></div>)
+}
